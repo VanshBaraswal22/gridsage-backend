@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>GridSage AI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      body {
+        font-family: Arial;
+        background: #f4f6fa;
+      }
+      .card {
+        max-width: 600px;
+        margin: 40px auto;
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px #ccc;
+      }
+      button {
+        width: 100%;
+        padding: 10px;
+        background: #1f3c88;
+        color: white;
+        border: none;
+        border-radius: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h2>GridSage AI – Hybrid Demand Forecast</h2>
+      <textarea id="input" rows="6" style="width: 100%">
+Paste 24x8 JSON array here
+</textarea
+      >
+      <br /><br />
+      <button onclick="predict()">Predict</button>
+      <h3 id="result"></h3>
+    </div>
+
+    <script>
+      function predict() {
+        let seq;
+        try {
+          seq = JSON.parse(document.getElementById("input").value);
+        } catch (e) {
+          document.getElementById("result").innerText =
+            "❌ Invalid JSON format";
+          return;
+        }
+
+        document.getElementById("result").innerText = "⏳ Predicting...";
+
+     fetch("https://gridsage-backend.onrender.com/predict", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sequence: seq }),
+        })
+          .then((res) => {
+            if (!res.ok) throw new Error("Server error");
+            return res.json();
+          })
+          .then((data) => {
+            document.getElementById("result").innerText =
+              "✅ Predicted Demand: " + data.predicted_demand_MW + " MW";
+          })
+          .catch((err) => {
+            document.getElementById("result").innerText =
+              "❌ Error connecting to backend";
+          });
+      }
+    </script>
+  </body>
+</html>
